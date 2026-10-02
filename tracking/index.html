@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Summerset Lead Tracking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbfaf7;--card:#fff;--ink:#1c1f23;--mute:#5e6670;--line:#dcd8cf;--node:#f2efe8;
+  --good:#2f6f5e;--good2:#d9ebe5;--bad:#b0412f;--bad2:#f6e3df;--id:#c98a12;--id2:#fbefd5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141618;--card:#1c1f22;--ink:#eceae5;--mute:#a3a9b0;--line:#33383e;--node:#23272b;
+  --good:#7cc4ad;--good2:#1f3a33;--bad:#f0907c;--bad2:#3a2420;--id:#f2bd52;--id2:#3a2f17}}
+:root[data-theme="dark"]{--bg:#141618;--card:#1c1f22;--ink:#eceae5;--mute:#a3a9b0;--line:#33383e;--node:#23272b;
+  --good:#7cc4ad;--good2:#1f3a33;--bad:#f0907c;--bad2:#3a2420;--id:#f2bd52;--id2:#3a2f17}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,-apple-system,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:36px 16px 64px}
+h1{font-size:32px;line-height:1.15;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:0 0 24px}
+p,li{text-wrap:pretty}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 20px 22px;position:relative;overflow:hidden}
+.mode{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:5px 10px;border-radius:999px;margin-bottom:18px;transition:background .4s,color .4s}
+.mode.before{background:var(--bad2);color:var(--bad)}.mode.after{background:var(--good2);color:var(--good)}.mode.intro{background:var(--node);color:var(--mute)}
+.track{position:relative;display:flex;align-items:stretch;gap:0;margin:8px 0 6px}
+.node{flex:1 1 0;min-width:0;background:var(--node);border:2px solid transparent;border-radius:12px;padding:12px 10px 10px;text-align:center;transition:border-color .4s,background .4s,opacity .4s;position:relative}
+.node .ic{font-size:22px;line-height:1}
+.node .nm{font-weight:600;font-size:14px;margin-top:6px;line-height:1.25}
+.node .tg{font-size:12px;color:var(--mute);margin-top:2px;line-height:1.3}
+.node .note{margin-top:8px;font-size:12px;font-weight:600;border-radius:8px;padding:5px 6px;opacity:0;transform:translateY(4px);transition:opacity .35s,transform .35s;line-height:1.3}
+.node .note.show{opacity:1;transform:none}
+.note.bad{background:var(--bad2);color:var(--bad)}.note.neu{background:var(--bg);color:var(--mute)}.note.good{background:var(--good2);color:var(--good)}
+.node.on{border-color:var(--ink)}
+.node.dim{opacity:.55}
+.conn{flex:0 0 34px;position:relative}
+.conn::before{content:"";position:absolute;left:4px;right:4px;top:50%;border-top:3px solid var(--line);transition:border-color .4s}
+.conn.ok::before{border-top-color:var(--good)}
+.conn.broken::before{border-top:3px dashed var(--bad)}
+.conn .x{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);width:22px;height:22px;border-radius:50%;background:var(--bad);color:var(--card);font-weight:700;font-size:13px;display:grid;place-items:center;transition:transform .3s}
+.conn.broken .x{transform:translate(-50%,-50%) scale(1)}
+.token{position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--card);display:grid;place-items:center;font-size:16px;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);transition:transform .9s cubic-bezier(.6,0,.3,1),opacity .4s,background .4s;z-index:3;pointer-events:none}
+.badge{position:absolute;top:-12px;right:-26px;background:var(--id);color:#1c1f23;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap;transition:transform .8s cubic-bezier(.5,0,.8,.6),opacity .8s}
+.badge.lost{transform:translate(-30px,70px) rotate(-30deg);opacity:0}
+.token.stuck{animation:shake .5s 2}
+@keyframes shake{25%{margin-left:-5px}75%{margin-left:5px}}
+.token.glow{box-shadow:0 0 0 6px var(--good2),0 4px 14px rgba(0,0,0,.25)}
+.cap{min-height:118px;margin-top:22px}
+.cap h2{font-size:22px;margin:0 0 6px;line-height:1.25}
+.cap p{margin:0;font-size:17px;color:var(--ink);max-width:760px}
+.cap .fade{animation:fin .45s ease both}
+@keyframes fin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ctl{display:flex;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+button{font:inherit;font-weight:600;font-size:15px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:9px 16px;cursor:pointer}
+button.pri{background:var(--ink);color:var(--card);border-color:var(--ink)}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:auto}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);cursor:pointer;transition:background .3s,transform .3s}
+.dots i.on{background:var(--ink);transform:scale(1.25)}
+.after-box{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.after-box div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.after-box b{display:block;font-size:15px;margin-bottom:4px}
+.after-box span{color:var(--mute);font-size:14px}
+@media (max-width:720px){
+  .track{flex-direction:column}
+  .node{display:grid;grid-template-columns:30px 1fr;text-align:left;align-items:center;column-gap:10px;padding:10px 12px}
+  .node .ic{grid-row:span 2}.node .nm{margin-top:0}.node .note{grid-column:2;margin-top:6px}
+  .conn{flex:0 0 26px}
+  .conn::before{left:50%;right:auto;top:3px;bottom:3px;border-top:0;border-left:3px solid var(--line)}
+  .conn.ok::before{border-left-color:var(--good)}
+  .conn.broken::before{border-top:0;border-left:3px dashed var(--bad)}
+  .after-box{grid-template-columns:1fr}
+  h1{font-size:27px}.cap h2{font-size:19px}.cap p{font-size:16px}.cap{min-height:150px}
+}
+@media (prefers-reduced-motion:reduce){.token,.badge,.node,.conn::before,.note{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body><main>
+<h1>How a Google Ads lead is tracked</h1>
+<p class="sub">Summerset Senior Living · what we found and fixed on October 1, 2026</p>
+
+<section class="stage" aria-live="polite">
+  <div class="mode intro" id="mode">The path</div>
+  <div class="track" id="track">
+    <div class="node" data-i="0"><div class="ic">🔎</div><div class="nm">Google ad</div><div class="tg">A family searches and clicks</div><div class="note"></div></div>
+    <div class="conn" data-c="0"><span class="x">✕</span></div>
+    <div class="node" data-i="1"><div class="ic">🏡</div><div class="nm">Main website</div><div class="tg">summerset<wbr>seniorliving<wbr>.com</div><div class="note"></div></div>
+    <div class="conn" data-c="1"><span class="x">✕</span></div>
+    <div class="node" data-i="2"><div class="ic">📝</div><div class="nm">Form page</div><div class="tg">info.<wbr>summersetsl<wbr>.com</div><div class="note"></div></div>
+    <div class="conn" data-c="2"><span class="x">✕</span></div>
+    <div class="node" data-i="3"><div class="ic">📇</div><div class="nm">ActiveCampaign</div><div class="tg">The lead record</div><div class="note"></div></div>
+    <div class="conn" data-c="3"><span class="x">✕</span></div>
+    <div class="node" data-i="4"><div class="ic">🔑</div><div class="nm">WelcomeHome</div><div class="tg">Tour and move-in</div><div class="note"></div></div>
+    <div class="conn" data-c="4"><span class="x">✕</span></div>
+    <div class="node" data-i="5"><div class="ic">📈</div><div class="nm">Google Ads learns</div><div class="tg">Which ads bring residents</div><div class="note"></div></div>
+    <div class="token" id="token">👪<span class="badge" id="badge">Click ID</span></div>
+  </div>
+  <div class="cap"><div id="cap"></div></div>
+  <div class="ctl">
+    <button id="back">Back</button>
+    <button id="next" class="pri">Next</button>
+    <button id="play">Play all</button>
+    <div class="dots" id="dots"></div>
+  </div>
+</section>
+
+<div class="after-box">
+  <div><b>Every Google Ads lead keeps its source</b><span>ActiveCampaign now shows which leads came from a Google Ads click.</span></div>
+  <div><b>Results go back to Google</b><span>Brochures, visits, advisor calls, tours and move-ins all reach Google Ads.</span></div>
+  <div><b>Cost per move-in, by campaign</b><span>In four to six weeks we can show which campaigns bring residents, not just form fills.</span></div>
+</div>
+</main>
+<script>
+// One step = where the family is, whether the click ID is still with them, which links are broken or working, and the notes on each box.
+const STEPS = [
+  { mode:"intro", at:0, id:true, title:"A family clicks your ad",
+    text:"Google gives every ad click a unique ID. That ID is how Google later learns which ad and keyword brought this family." },
+  { mode:"intro", at:1, id:true, ok:[0], title:"They land on your main website",
+    text:"The click ID comes with them, in the page address." },
+  { mode:"before", at:2, id:false, ok:[0], broken:[1], notes:{2:["bad","No click ID"]}, title:"Before: the ID was lost between the two websites",
+    text:"Your forms live on a second website. The form reads the click ID only from its own page address, and the click from the main site did not pass it along. So the ID stayed behind." },
+  { mode:"before", at:3, id:false, ok:[0,2], broken:[1], notes:{2:["bad","No click ID"],3:["bad","Source: unknown"]}, title:"ActiveCampaign got the lead, but not where it came from",
+    text:"The form still worked, and the lead reached ActiveCampaign. But the click ID field was blank on every contact, so nobody could tie a lead to a Google ad." },
+  { mode:"before", at:4, id:false, ok:[0,2,3], broken:[1,4], notes:{2:["bad","No click ID"],3:["bad","Source: unknown"],4:["neu","Move-ins recorded"]}, stuck:true,
+    title:"The results never went back to Google Ads",
+    text:"The step that sends ActiveCampaign leads back to Google Ads was set up but never switched on. Google counted form fills from the thank-you pages, but never learned which ads led to tours and move-ins." },
+  { mode:"after", at:0, id:true, reset:true, title:"Now: the same family, after the fix",
+    text:"On October 1 we changed both broken links. Watch the click ID this time." },
+  { mode:"after", at:2, id:true, ok:[0,1], notes:{2:["good","Click ID saved"]}, title:"The ID now crosses to the form page",
+    text:"A small script on the main website adds the click ID to every link to the form pages. It also remembers the ID for 90 days, so a family that comes back later still counts." },
+  { mode:"after", at:3, id:true, ok:[0,1,2], notes:{2:["good","Click ID saved"],3:["good","Source: Google Ads ✓"]}, title:"ActiveCampaign knows the lead came from Google Ads",
+    text:"Each brochure, visit and advisor form now arrives with its click ID, and the lead type goes with it." },
+  { mode:"after", at:5, id:true, glow:true, ok:[0,1,2,3,4], notes:{2:["good","Click ID saved"],3:["good","Source: Google Ads ✓"],4:["good","Tour and move-in ✓"],5:["good","Learns from residents"]},
+    title:"Tours and move-ins now go back to Google Ads",
+    text:"When WelcomeHome marks a tour or a move-in, Google Ads hears about it. Google can then favor the ads that bring residents, not just brochure downloads." },
+  { mode:"after", at:5, id:true, glow:true, ok:[0,1,2,3,4], notes:{2:["good","Click ID saved"],3:["good","Source: Google Ads ✓"],4:["good","Tour and move-in ✓"],5:["good","Learns from residents"]},
+    title:"Already working",
+    text:"On October 1 the first two Google Ads leads, one brochure and one visit request, went through every step and showed up in Google Ads on the right campaigns." },
+];
+const $ = (s, r=document) => r.querySelector(s), $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const track = $("#track"), token = $("#token"), badge = $("#badge"), cap = $("#cap"), mode = $("#mode"), dots = $("#dots");
+const MODE_TEXT = { intro:"The path", before:"Before October 1", after:"After October 1" };
+let i = 0, timer = null;
+STEPS.forEach((_, k) => { const d = document.createElement("i"); d.title = "Step " + (k + 1); d.onclick = () => { stop(); go(k); }; dots.appendChild(d); });
+
+function place(at, instant) {
+  const n = $(`.node[data-i="${at}"]`), tb = track.getBoundingClientRect(), nb = n.getBoundingClientRect();
+  const vertical = getComputedStyle(track).flexDirection === "column";
+  const x = vertical ? nb.right - tb.left - 50 : nb.left - tb.left + nb.width / 2 - 17;
+  const y = vertical ? nb.top - tb.top + nb.height / 2 - 17 : nb.top - tb.top - 22;
+  if (instant) token.style.transition = "none";
+  token.style.transform = `translate(${x}px,${y}px)`;
+  if (instant) { token.offsetWidth; token.style.transition = ""; }
+}
+function go(k, instant) {
+  const s = STEPS[k], prev = STEPS[i]; i = k;
+  console.log(`[tracking-story] step ${k + 1}/${STEPS.length}: ${s.title}`);
+  mode.className = "mode " + s.mode; mode.textContent = MODE_TEXT[s.mode];
+  $$(".conn").forEach(c => { const n = +c.dataset.c; c.classList.toggle("ok", (s.ok || []).includes(n)); c.classList.toggle("broken", (s.broken || []).includes(n)); });
+  $$(".node").forEach(n => {
+    const idx = +n.dataset.i, note = $(".note", n), v = (s.notes || {})[idx];
+    n.classList.toggle("on", idx === s.at); n.classList.toggle("dim", s.stuck && idx === 5);
+    note.className = "note" + (v ? " show " + v[0] : ""); note.textContent = v ? v[1] : "";
+  });
+  token.style.background = s.mode === "before" && !s.id ? "var(--mute)" : "";
+  token.classList.toggle("glow", !!s.glow);
+  const jump = instant || s.reset || (prev && s.at < prev.at);
+  if (s.id) { badge.style.transition = "none"; badge.classList.remove("lost"); badge.offsetWidth; badge.style.transition = ""; }
+  else setTimeout(() => badge.classList.add("lost"), jump ? 0 : 450);
+  place(s.at, jump);
+  token.classList.remove("stuck"); if (s.stuck) setTimeout(() => token.classList.add("stuck"), 900);
+  cap.innerHTML = `<div class="fade"><h2>${s.title}</h2><p>${s.text}</p></div>`;
+  $$("i", dots).forEach((d, n) => d.classList.toggle("on", n === k));
+  $("#back").disabled = k === 0; $("#next").textContent = k === STEPS.length - 1 ? "Start over" : "Next";
+}
+function stop() { clearInterval(timer); timer = null; $("#play").textContent = "Play all"; }
+$("#next").onclick = () => { stop(); go(i === STEPS.length - 1 ? 0 : i + 1); };
+$("#back").onclick = () => { stop(); if (i > 0) go(i - 1); };
+$("#play").onclick = () => {
+  if (timer) return stop();
+  $("#play").textContent = "Pause"; if (i === STEPS.length - 1) go(0);
+  timer = setInterval(() => { if (i >= STEPS.length - 1) return stop(); go(i + 1); }, 5200);
+};
+document.addEventListener("keydown", e => { if (e.key === "ArrowRight") $("#next").click(); if (e.key === "ArrowLeft") $("#back").click(); });
+addEventListener("resize", () => place(STEPS[i].at, true));
+const START = Math.min(STEPS.length, Math.max(1, +new URLSearchParams(location.search).get("step") || 1)) - 1;
+addEventListener("load", () => go(START, true));
+go(START, true);
+</script>
+</body></html>
