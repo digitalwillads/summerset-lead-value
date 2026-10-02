@@ -67,10 +67,11 @@ button:disabled{opacity:.4;cursor:default}
   .conn.broken::before{border-top:0;border-left:3px dashed var(--bad)}
     h1{font-size:27px}.cap h2{font-size:19px}.cap p{font-size:16px}.cap{min-height:150px}
 }
+html.embed h1,html.embed .sub{display:none}html.embed main{padding:14px 16px}html.embed .stage{border:0;padding:12px 8px}html.embed .cap{min-height:96px;margin-top:14px}html.embed .ctl{margin-top:10px}
 @media (prefers-reduced-motion:reduce){.token,.badge,.node,.conn::before,.note{transition:none!important;animation:none!important}}
 </style>
 </head>
-<body><main>
+<body><script>if(new URLSearchParams(location.search).has("embed"))document.documentElement.classList.add("embed")</script><main>
 <h1>How a Google Ads lead is tracked</h1>
 <p class="sub">Summerset Senior Living · what we found and fixed on October 1, 2026</p>
 
