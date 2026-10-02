@@ -57,10 +57,6 @@ button:disabled{opacity:.4;cursor:default}
 .dots{display:flex;gap:6px;margin-left:auto}
 .dots i{width:9px;height:9px;border-radius:50%;background:var(--line);cursor:pointer;transition:background .3s,transform .3s}
 .dots i.on{background:var(--ink);transform:scale(1.25)}
-.after-box{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.after-box div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
-.after-box b{display:block;font-size:15px;margin-bottom:4px}
-.after-box span{color:var(--mute);font-size:14px}
 @media (max-width:720px){
   .track{flex-direction:column}
   .node{display:grid;grid-template-columns:30px 1fr;text-align:left;align-items:center;column-gap:10px;padding:10px 12px}
@@ -69,8 +65,7 @@ button:disabled{opacity:.4;cursor:default}
   .conn::before{left:50%;right:auto;top:3px;bottom:3px;border-top:0;border-left:3px solid var(--line)}
   .conn.ok::before{border-left-color:var(--good)}
   .conn.broken::before{border-top:0;border-left:3px dashed var(--bad)}
-  .after-box{grid-template-columns:1fr}
-  h1{font-size:27px}.cap h2{font-size:19px}.cap p{font-size:16px}.cap{min-height:150px}
+    h1{font-size:27px}.cap h2{font-size:19px}.cap p{font-size:16px}.cap{min-height:150px}
 }
 @media (prefers-reduced-motion:reduce){.token,.badge,.node,.conn::before,.note{transition:none!important;animation:none!important}}
 </style>
@@ -104,11 +99,6 @@ button:disabled{opacity:.4;cursor:default}
   </div>
 </section>
 
-<div class="after-box">
-  <div><b>Every Google Ads lead keeps its source</b><span>ActiveCampaign now shows which leads came from a Google Ads click.</span></div>
-  <div><b>Results go back to Google</b><span>Brochures, visits, advisor calls, tours and move-ins all reach Google Ads.</span></div>
-  <div><b>Cost per move-in, by campaign</b><span>In four to six weeks we can show which campaigns bring residents, not just form fills.</span></div>
-</div>
 </main>
 <script>
 // One step = where the family is, whether the click ID is still with them, which links are broken or working, and the notes on each box.
